@@ -6,8 +6,10 @@
  */
 
 // dependencies
-import { sampleHandler } from './handlers/routeHandlers/sampleHandlers.js';
+import { sampleHandler } from './handlers/routeHandlers/sampleHandler.js';
+import { userHandler } from './handlers/routeHandlers/userHandler.js';
 
 export const routes = {
     sample: sampleHandler,
+    user: userHandler,
 };

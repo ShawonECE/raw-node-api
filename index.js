@@ -9,15 +9,15 @@
 import http from 'http';
 import { handleReqRes } from './helpers/handleReqRes.js';
 import { environment } from './helpers/environments.js';
-import { create, read, update, deleteFile } from './lib/data.js';
+// import { create, read, update, deleteFile } from './lib/data.js';
 
 // app object - module scaffolding
 const app = {};
 
 // testing file system
-deleteFile('test', 'newFile', (err) => {
-    console.log(err);
-});
+// deleteFile('test', 'newFile', (err) => {
+//     console.log(err);
+// });
 
 // handle request response
 app.handleReqRes = handleReqRes;

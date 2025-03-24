@@ -6,7 +6,7 @@
  */
 
 // dependencies
-import { create, read, update, deleteFile, baseDir } from '../../lib/data.js';
+import { create, read, update, deleteFile } from '../../lib/data.js';
 import { hash, parseJSON } from '../../helpers/utilities.js';
 
 const _users = {};
@@ -58,6 +58,7 @@ _users.post = (requestProperties, callback) => {
         });
     }
 };
+
 _users.get = (requestProperties, callback) => {
     // check the phone number is valid
     const phone = typeof requestProperties.queryStringObject.phone === 'string' && requestProperties.queryStringObject.phone.trim().length === 11 ? requestProperties.queryStringObject.phone : false;
@@ -81,8 +82,94 @@ _users.get = (requestProperties, callback) => {
         });
     }
 };
-_users.put = (requestProperties, callback) => {};
-_users.delete = (requestProperties, callback) => {};
+
+_users.put = (requestProperties, callback) => {
+    // check the phone number is valid
+    const phone = typeof requestProperties.body.phone === 'string' && requestProperties.body.phone.trim().length === 11 ? requestProperties.body.phone : false;
+
+    const firstName = typeof requestProperties.body.firstName === 'string' && requestProperties.body.firstName.trim().length > 0 ? requestProperties.body.firstName : false;
+
+    const lastName = typeof requestProperties.body.lastName === 'string' && requestProperties.body.lastName.trim().length > 0 ? requestProperties.body.lastName : false;
+
+    const password = typeof requestProperties.body.password === 'string' && requestProperties.body.password.trim().length > 0 ? requestProperties.body.password : false;
+
+    if (phone) {
+        if (firstName || lastName || password) {
+            // lookup the user
+            read('users', phone, (error, userData) => {
+                const userDataObject = { ...parseJSON(userData) };
+                if (!error && userDataObject) {
+                    if (firstName) {
+                        userDataObject.firstName = firstName;
+                    }
+                    if (lastName) {
+                        userDataObject.lastName = lastName;
+                    }
+                    if (password) {
+                        userDataObject.password = hash(password);
+                    }
+
+                    // store to database
+                    update('users', phone, userDataObject, (err) => {
+                        if (!err) {
+                            callback(200, {
+                                message: 'User was updated successfully!',
+                            });
+                        } else {
+                            callback(500, {
+                                error: 'Could not update user!',
+                            });
+                        }
+                    });
+                } else {
+                    callback(400, {
+                        error: 'You have a problem in your request!',
+                    });
+                }
+            });
+        } else {
+            callback(400, {
+                error: 'Invalid data!',
+            });
+        }
+    } else {
+        callback(400, {
+            error: 'Invalid phone number. Please try again!',
+        });
+    }
+};
+
+_users.delete = (requestProperties, callback) => {
+    // check the phone number is valid
+    const phone = typeof requestProperties.queryStringObject.phone === 'string' && requestProperties.queryStringObject.phone.trim().length === 11 ? requestProperties.queryStringObject.phone : false;
+
+    if (phone) {
+        // lookup the user
+        read('users', phone, (error, userData) => {
+            if (!error && userData) {
+                deleteFile('users', phone, (err) => {
+                    if (!err) {
+                        callback(200, {
+                            message: 'User was successfully deleted!',
+                        });
+                    } else {
+                        callback(500, {
+                            error: 'Could not delete the specified user!',
+                        });
+                    }
+                });
+            } else {
+                callback(500, {
+                    error: 'Could not find the specified user!',
+                });
+            }
+        });
+    } else {
+        callback(400, {
+            error: 'There was a problem in your request!',
+        });
+    }
+};
 
 export const userHandler = (requestProperties, callback) => {
     const acceptedMethods = ['get', 'post', 'put', 'delete'];

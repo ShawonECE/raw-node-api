@@ -141,6 +141,22 @@ _token.delete = (requestProperties, callback) => {
     }
 };
 
+export const verifyToken = (id, phone, callback) => {
+    // lookup the token
+    read('tokens', id, (err, tokenData) => {
+        if (!err && tokenData) {
+            const tokenObject = parseJSON(tokenData);
+            if (tokenObject.phone === phone && tokenObject.expires > Date.now()) {
+                callback(true);
+            } else {
+                callback(false);
+            }
+        } else {
+            callback(false);
+        }
+    });
+};
+
 export const tokenHandler = (requestProperties, callback) => {
     const acceptedMethods = ['get', 'post', 'put', 'delete'];
     

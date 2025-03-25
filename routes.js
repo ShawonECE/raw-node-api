@@ -8,8 +8,10 @@
 // dependencies
 import { sampleHandler } from './handlers/routeHandlers/sampleHandler.js';
 import { userHandler } from './handlers/routeHandlers/userHandler.js';
+import { tokenHandler } from './handlers/routeHandlers/tokenHandler.js';
 
 export const routes = {
     sample: sampleHandler,
     user: userHandler,
+    token: tokenHandler,
 };
